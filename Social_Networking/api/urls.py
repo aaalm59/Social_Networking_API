@@ -1,17 +1,14 @@
 from django.urls import path
-from .views import SearchUsersAPIView, FriendRequestAPIView, AcceptFriendRequestAPIView, \
-    RejectFriendRequestAPIView, ListFriendsAPIView, ListPendingRequestsAPIView, FriendRequestRateLimitAPIView, \
-    CustomAuthToken, SignupAPIView
+from .views import user_signup,user_login,search_users,send_friend_request,accept_friend_request,reject_friend_request,friends_list,pending_friend_requests
+
 
 urlpatterns = [
-    path('search-users/', SearchUsersAPIView.as_view(), name='search-users'),
-    path('friend-request/', FriendRequestAPIView.as_view(), name='friend-request'),
-    path('accept-friend-request/<int:pk>/', AcceptFriendRequestAPIView.as_view(), name='accept-friend-request'),
-    path('reject-friend-request/<int:pk>/', RejectFriendRequestAPIView.as_view(), name='reject-friend-request'),
-    path('list-friends/', ListFriendsAPIView.as_view(), name='list-friends'),
-    path('list-pending-requests/', ListPendingRequestsAPIView.as_view(), name='list-pending-requests'),
-    path('friend-request-rate-limit/', FriendRequestRateLimitAPIView.as_view(), name='friend-request-rate-limit'),
-    path('login/', CustomAuthToken.as_view(), name='api_token_auth'),
-    path('signup/', SignupAPIView.as_view(), name='signup'),
+    path('signup/', user_signup, name='user_signup'),
+    path('login/', user_login, name='user_login'),
+    path('search/', search_users, name='search_users'),
+    path('send-friend-request/<int:receiver_id>/', send_friend_request, name='send_friend_request'),
+    path('accept-friend-request/<int:request_id>/', accept_friend_request, name='accept_friend_request'),
+    path('reject-friend-request/<int:request_id>/', reject_friend_request, name='reject_friend_request'),
+    path('friends-list/', friends_list, name='friends_list'),
+    path('pending-friend-requests/', pending_friend_requests, name='pending_friend_requests'),
 ]
-

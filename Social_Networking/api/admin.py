@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import FriendRequest, User,UserProfile
+from .models import FriendRequest,UserProfile
 # Register your models here.
 
 admin.site.register(FriendRequest)
