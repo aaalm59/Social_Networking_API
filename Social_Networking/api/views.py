@@ -79,8 +79,10 @@ class CustomAuthToken(ObtainAuthToken):
     @permission_classes([AllowAny])
     @authentication_classes([])
     def post(self, request, *args, **kwargs):
+        
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
+        print("----------------------",request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request, user)
