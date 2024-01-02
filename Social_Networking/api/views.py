@@ -4,13 +4,12 @@ from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .models import UserProfile, FriendRequest
-from .serializers import UserProfileSerializer, FriendRequestSerializer
+from .serializers import UserProfileSerializer, FriendRequestSerializer,UserSerializer, UserSignupSerializer
 from django.db.models import Q
 from django.utils import timezone
 from .models import UserProfile, FriendRequest
 from rest_framework import  permissions, status
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer, UserSignupSerializer
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -26,8 +25,10 @@ def user_signup(request):
 def user_login(request):
     username = request.data.get('username')
     password = request.data.get('password')
+    print('username',username,'------','password',password)
 
     user = authenticate(request, username=username, password=password)
+    print('---------',user)
     
     if user:
         login(request, user)
@@ -51,6 +52,8 @@ def search_users(request):
         users = User.objects.filter(Q(username__icontains=keyword) | Q(first_name__icontains=keyword) | Q(last_name__icontains=keyword))
         serializer = UserProfileSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    return Response({'message': 'Invalid search criteria'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
