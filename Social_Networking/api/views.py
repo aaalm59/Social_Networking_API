@@ -58,6 +58,8 @@ def search_users(request):
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def send_friend_request(request, receiver_id):
+    if not request.user.is_authenticated:
+        return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
     sender_profile = request.user.profile
     receiver_profile = UserProfile.objects.get(pk=receiver_id)
 

@@ -1,17 +1,3 @@
-# from django.contrib.auth.models import User
-# from django.db import models
-
-# class FriendRequest(models.Model):
-#     sender = models.ForeignKey(User, related_name='sent_friend_requests', on_delete=models.CASCADE)
-#     receiver = models.ForeignKey(User, related_name='received_friend_requests', on_delete=models.CASCADE)
-#     status = models.CharField(choices=(('pending', 'Pending'), ('accepted', 'Accepted'), ('rejected', 'Rejected')), max_length=10)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-# class UserProfile(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     # Add any additional user profile fields if needed
-
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -19,7 +5,7 @@ from django.utils import timezone
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # Add any additional fields as needed for your user profile
-
+User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
 class FriendRequest(models.Model):
     STATUS_CHOICES = [
