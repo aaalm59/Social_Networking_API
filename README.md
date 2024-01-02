@@ -1,75 +1,43 @@
-# Social_Networking_API
-
 
 API Functionalities:
 
-Search Users API:
+User Authentication:
 
-Endpoint: /api/search-users/
-Method: GET
-Description: Search for other users by email and name with pagination (10 records per page).
-Request Parameters:
-search_keyword (string): The keyword to search for (either name or email).
-Response:
-If the search keyword matches an exact email, return the user associated with that email.
-If the search keyword contains any part of the name, return a list of all matching users.
-Paginate the results (10 records per page).
-Friend Request API:
+User Signup: POST /api/signup/
+User Login: POST /api/login/
+User Search:
 
-Endpoint: /api/friend-request/
+Search Users: GET /api/search/?keyword=<search_keyword>
+Friend Requests:
 
-Method: POST
+Send Friend Request: POST /api/send-friend-request/<int:receiver_id>/
+Accept Friend Request: POST /api/accept-friend-request/<int:request_id>/
+Reject Friend Request: POST /api/reject-friend-request/<int:request_id>/
+Friends List:
 
-Description: Send a friend request to another user.
+List Friends: GET /api/friends-list/
+Pending Friend Requests:
 
-Request Parameters:
+List Pending Friend Requests: GET /api/pending-friend-requests/
+Remember to include the appropriate authentication headers (e.g., Token-based authentication) in your requests to access the authenticated endpoints. Adjust the URLs based on your project structure and preferences.
 
-receiver_email (string): Email of the user to whom the friend request is sent.
-Response:
+Here's a brief explanation of each endpoint:
 
-Success message on successful request submission.
-Endpoint: /api/accept-friend-request/<int:request_id>/
+User Authentication:
 
-Method: POST
+POST /api/signup/: User registration endpoint.
+POST /api/login/: User login endpoint.
+User Search:
 
-Description: Accept a friend request.
+GET /api/search/?keyword=<search_keyword>: Search for users by email or name.
+Friend Requests:
 
-Request Parameters:
+POST /api/send-friend-request/<int:receiver_id>/: Send a friend request to the user with the specified ID.
+POST /api/accept-friend-request/<int:request_id>/: Accept a friend request with the specified ID.
+POST /api/reject-friend-request/<int:request_id>/: Reject a friend request with the specified ID.
+Friends List:
 
-request_id (integer): ID of the friend request to accept.
-Response:
+GET /api/friends-list/: Retrieve the list of friends for the authenticated user.
+Pending Friend Requests:
 
-Success message on successful acceptance.
-Endpoint: /api/reject-friend-request/<int:request_id>/
-
-Method: POST
-
-Description: Reject a friend request.
-
-Request Parameters:
-
-request_id (integer): ID of the friend request to reject.
-Response:
-
-Success message on successful rejection.
-List Friends API:
-
-Endpoint: /api/list-friends/
-Method: GET
-Description: List all friends (users who have accepted friend requests).
-Response:
-List of friend users.
-List Pending Friend Requests API:
-
-Endpoint: /api/list-pending-requests/
-Method: GET
-Description: List all pending friend requests (received friend requests).
-Response:
-List of pending friend requests.
-Friend Request Rate Limit API:
-
-Endpoint: /api/friend-request-rate-limit/
-Method: GET
-Description: Check if the user can send a friend request (limit: 3 requests per minute).
-Response:
-Success message if the user is allowed to send a friend request, otherwise an error message.
+GET /api/pending-friend-requests/: Retrieve the list of pending friend requests for the authenticated user.
