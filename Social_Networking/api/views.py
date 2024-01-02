@@ -7,19 +7,9 @@ from .models import UserProfile, FriendRequest
 from .serializers import UserProfileSerializer, FriendRequestSerializer
 from django.db.models import Q
 from django.utils import timezone
-from rest_framework import  permissions, status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
 from .models import UserProfile, FriendRequest
-from .serializers import UserProfileSerializer, FriendRequestSerializer
-
-# api/views.py
-from rest_framework import generics, permissions, status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
+from rest_framework import  permissions, status
 from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from .serializers import UserSerializer, UserSignupSerializer
 
 @api_view(['POST'])

@@ -21,9 +21,6 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
         fields = '__all__'
-        
-        
-
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
