@@ -4,8 +4,8 @@ from django.utils import timezone
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # Add any additional fields as needed for your user profile
-User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
+# User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
+
 
 class FriendRequest(models.Model):
     STATUS_CHOICES = [

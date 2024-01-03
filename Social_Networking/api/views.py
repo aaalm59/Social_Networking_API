@@ -1,4 +1,3 @@
-# api/views.py
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes
@@ -9,7 +8,8 @@ from django.db.models import Q
 from django.utils import timezone
 from .models import UserProfile, FriendRequest
 from rest_framework import  permissions, status
-from rest_framework.authtoken.models import Token
+# from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -20,47 +20,48 @@ def user_signup(request):
         return Response({'message': 'User successfully registered'}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
-@permission_classes([permissions.AllowAny])
+# @permission_classes([permissions.AllowAny])
 def user_login(request):
     username = request.data.get('username')
     password = request.data.get('password')
-    print('username',username,'------','password',password)
-
+    # print('username', username, '------', 'password', password)
     user = authenticate(request, username=username, password=password)
-    print('---------',user)
-    
+    # print('---------', user)
+
     if user:
         login(request, user)
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key, 'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
-    
-    return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+        
+        response_data = {
+            'access': access_token,
+            'refresh': refresh_token,
+            # 'user': UserSerializer(user).data,
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
 
+    return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
-def search_users(request):
-    keyword = request.query_params.get('keyword', '')
-    
-    if '@' in keyword:
-        user = User.objects.filter(email__iexact=keyword).first()
-        if user:
-            serializer = UserProfileSerializer(user.profile)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        users = User.objects.filter(Q(username__icontains=keyword) | Q(first_name__icontains=keyword) | Q(last_name__icontains=keyword))
-        serializer = UserProfileSerializer(users, many=True)
+def search_users(request):     
+        keyword = request.query_params.get('q', '')
+        users = User.objects.filter(
+            Q(email__iexact=keyword) | Q(first_name__icontains=keyword) | Q(last_name__icontains=keyword)
+        ).exclude(id=request.user.id)[:10]
+        serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    return Response({'message': 'Invalid search criteria'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def send_friend_request(request, receiver_id):
-    if not request.user.is_authenticated:
-        return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    # if not request.user.is_authenticated:
+    #     return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
     sender_profile = request.user.profile
+    print('sender_profile----',sender_profile)
     receiver_profile = UserProfile.objects.get(pk=receiver_id)
 
     if sender_profile != receiver_profile:
@@ -75,7 +76,9 @@ def send_friend_request(request, receiver_id):
             friend_request.save()
 
             return Response({'message': 'Friend request sent successfully'}, status=status.HTTP_201_CREATED)
-
+        else:
+            return Response({'message': 'Friend request NOT sent '})
+            
     return Response({'error': 'Invalid friend request'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
