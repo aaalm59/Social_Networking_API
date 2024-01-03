@@ -1,3 +1,30 @@
+**Without Docker**
+Create a virtual environment:
+python -m venv venv
+Activate the virtual environment:
+On Windows:
+venv\Scripts\activate
+On Unix or MacOS:
+source venv/bin/activate
+Install dependencies:
+pip install -r requirements.txt
+Navigate to project directory /app
+cd Social_Networking_API
+Apply migrations:
+python manage.py migrate
+Run the development server:
+python manage.py runserver
+Visit the server URL in the browser with port 8000
+127.0.0.1:8000
+
+
+
+
+
+
+
+
+
 
 API Functionalities:
 
