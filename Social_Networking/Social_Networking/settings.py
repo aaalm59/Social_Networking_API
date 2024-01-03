@@ -27,6 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+import datetime
+
+
+# Set the expiration time for JWT tokens (in seconds)
+JWT_EXPIRATION_DELTA = datetime.timedelta(hours=1)
 
 # Application definition
 
