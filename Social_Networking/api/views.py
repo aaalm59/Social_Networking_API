@@ -58,39 +58,34 @@ def search_users(request):
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def send_friend_request(request, receiver_id):
-    # if not request.user.is_authenticated:
-    #     return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
-    sender_profile = request.user.profile
-    print('sender_profile----',sender_profile)
-    receiver_profile = UserProfile.objects.get(pk=receiver_id)
+        try:
+            receiver = User.objects.get(pk=receiver_id)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if sender_profile != receiver_profile:
-        if not FriendRequest.objects.filter(sender=sender_profile.user, receiver=receiver_profile.user, status='pending').exists():
-            if FriendRequest.objects.filter(Q(sender=receiver_profile.user, receiver=sender_profile.user, status='pending') | Q(sender=sender_profile.user, receiver=receiver_profile.user, status='accepted')).exists():
-                return Response({'error': 'Friend request already exists or already friends'}, status=status.HTTP_400_BAD_REQUEST)
+        if receiver == request.user:
+            return Response({"detail": "You cannot send a friend request to yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
-            if sender_profile.sent_requests.filter(created_at__gte=timezone.now() - timezone.timedelta(minutes=1)).count() >= 3:
-                return Response({'error': 'You cannot send more than 3 friend requests within a minute'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        existing_request = FriendRequest.objects.filter(sender=request.user, receiver=receiver)
+        if existing_request.exists():
+            return Response({"detail": "Friend request already sent."}, status=status.HTTP_400_BAD_REQUEST)
 
-            friend_request = FriendRequest.objects.create(sender=sender_profile.user, receiver=receiver_profile.user, status='pending')
-            friend_request.save()
+        # Creating the friend request without using a serializer
+        friend_request = FriendRequest.objects.create(sender=request.user, receiver=receiver, status='pending')
 
-            return Response({'message': 'Friend request sent successfully'}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({'message': 'Friend request NOT sent '})
-            
-    return Response({'error': 'Invalid friend request'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Friend request sent successfully."}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def accept_friend_request(request, request_id):
-    friend_request = FriendRequest.objects.filter(pk=request_id, receiver=request.user, status='pending').first()
-
+    print("accepted-----------------------------",request_id)
+    friend_request = FriendRequest.objects.filter(pk=request_id,  status='pending').first() #receiver=request.user,
+    print('friend_request',friend_request)
     if friend_request:
         friend_request.status = 'accepted'
         friend_request.save()
         return Response({'message': 'Friend request accepted successfully'}, status=status.HTTP_200_OK)
-
+        
     return Response({'error': 'Invalid friend request'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -120,6 +115,7 @@ def friends_list(request):
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def pending_friend_requests(request):
-    pending_requests = FriendRequest.objects.filter(receiver=request.user, status='pending')
+    pending_requests = FriendRequest.objects.filter(status='pending') #receiver=request.user,
+    print('pending_requests',pending_requests)
     serializer = FriendRequestSerializer(pending_requests, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
