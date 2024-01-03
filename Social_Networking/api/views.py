@@ -79,7 +79,7 @@ def send_friend_request(request, receiver_id):
 @permission_classes([permissions.IsAuthenticated])
 def accept_friend_request(request, request_id):
     print("accepted-----------------------------",request_id)
-    friend_request = FriendRequest.objects.filter(pk=request_id,  status='pending').first() #receiver=request.user,
+    friend_request = FriendRequest.objects.filter(pk=request_id, status='pending').first() #receiver=request.user,
     print('friend_request',friend_request)
     if friend_request:
         friend_request.status = 'accepted'
